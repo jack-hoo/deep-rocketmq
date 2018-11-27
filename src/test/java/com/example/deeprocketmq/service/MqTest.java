@@ -32,17 +32,21 @@ public class MqTest {
     public void testProducer() throws MQClientException, UnsupportedEncodingException, RemotingException, InterruptedException, MQBrokerException {
         DefaultMQProducer producer = new
                 DefaultMQProducer("please_rename_unique_group_name");
+
         // Specify name server addresses.
-        producer.setNamesrvAddr("193.112.88.249:9876");
+        producer.setNamesrvAddr("localhost:9876");
+        producer.setInstanceName("deep-rocketmq");
+        producer.setRetryTimesWhenSendFailed(2);
         //Launch the instance.
         producer.start();
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 1; i++) {
             //Create a message instance, specifying topic, tag and message body.
-            Message msg = new Message("order" /* Topic */,
+            Message msg = new Message("TopicTest" /* Topic */,
                     "TagA" /* Tag */,
                     ("Hello RocketMQ " +
                             i).getBytes(RemotingHelper.DEFAULT_CHARSET) /* Message body */
             );
+            msg.setDelayTimeLevel(3);
             //Call send message to deliver message to one of brokers.
             SendResult sendResult = producer.send(msg);
             System.out.printf("%s%n", sendResult);
@@ -57,7 +61,7 @@ public class MqTest {
         DefaultMQPushConsumer consumer = new DefaultMQPushConsumer("please_rename_unique_group_name");
 
         // Specify name server addresses.
-        consumer.setNamesrvAddr("193.112.88.249:9876");
+        consumer.setNamesrvAddr("localhost:9876");
 
         // Subscribe one more more topics to consume.
         consumer.subscribe("order", "*");
